@@ -56,9 +56,13 @@ nav { display: flex; gap: 6px; }
 #modes button { padding: 7px; border: 0; border-radius: 8px; background: none; color: var(--muted); font-weight: 600; transition: background .15s, color .15s; }
 #modes button[aria-selected="true"] { background: #2a3a5c; color: var(--text); }
 
-#search { position: relative; }
+#search { position: relative; display: flex; gap: 8px; }
+#guess-add {
+  flex: none; padding: 0 16px; border: 0; border-radius: 11px; background: var(--accent); color: #1a1205; font-weight: 700;
+}
+#guess-add:disabled { opacity: .5; cursor: default; }
 #guess {
-  width: 100%; padding: 12px 14px; border-radius: 11px; border: 1px solid var(--line); background: #070d1a; font-size: 16px;
+  flex: 1; min-width: 0; width: 100%; padding: 12px 14px; border-radius: 11px; border: 1px solid var(--line); background: #070d1a; font-size: 16px;
   transition: border-color .15s;
 }
 #guess:focus { outline: none; border-color: var(--accent); }
@@ -169,7 +173,9 @@ dialog button.ghost { background: none; border-color: transparent; color: var(--
 .menu-inner { width: min(860px, 100%); text-align: center; animation: pop .3s cubic-bezier(.2, .8, .3, 1); }
 .logo { font-size: clamp(38px, 7vw, 58px); font-weight: 700; letter-spacing: .01em; }
 .tagline { margin: 2px 0 26px; color: var(--muted); font-size: 17px; }
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.menu-card { grid-column: span 2; }
+.menu-card:nth-child(n+7) { grid-column: span 3; }
 .menu-card {
   display: flex; flex-direction: column; gap: 7px; padding: 20px; text-align: left; border-radius: 15px; border: 1px solid var(--line);
   background: var(--panel); transition: transform .15s, border-color .15s, background .15s;
@@ -181,11 +187,47 @@ dialog button.ghost { background: none; border-color: transparent; color: var(--
 .swatch.heat { background: linear-gradient(90deg, #5fb4ff, #f5e15a, #ff1f7d); }
 .swatch.hop { background: linear-gradient(90deg, #5fb4ff, #ffb347, #3dffa2); }
 .swatch.names { background: #2fd6b5; }
+.swatch.pin { background: linear-gradient(90deg, #ff5a36, #ffb347, #3dffa2); }
+.swatch.size { background: linear-gradient(90deg, #5fb4ff 50%, #ffb347 50%); }
+.card .prompt { margin-top: 8px; font-size: 15px; color: var(--muted); }
+.card .prompt b { display: block; font-size: 22px; line-height: 1.2; color: var(--text); }
+.swatch.nbr { background: linear-gradient(90deg, #2fd6b5 30%, #ffb347 30%, #ffb347 70%, #2fd6b5 70%); }
+.swatch.sweep { background: linear-gradient(90deg, #3dffa2, #2fd6b5, #5fb4ff); }
+.swatch.odd { background: linear-gradient(90deg, #5fb4ff 75%, #3dffa2 75%); }
+#pin-best, #nbr-stats, #sweep-tries, #odd-best { font-size: 12px; }
+#pin-step, #size-best, #nbr-misses, #sweep-step, #odd-lives { font-size: 15px; }
+.sweep-top { font-size: 13px; }
+#sweep-tries:empty, .sweep-top:has(#sweep-region:empty) { display: none; }
+#sweep-regions { flex: 1; min-height: 0; padding-bottom: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; overflow-y: auto; }
+#sweep-regions button {
+  display: flex; flex-direction: column; gap: 2px; padding: 9px 10px; text-align: left; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--panel-2);
+}
+#sweep-regions button:hover { background: #1e2c49; }
+#sweep-regions b { font-size: 14px; line-height: 1.2; }
+#sweep-regions small { font-size: 12px; color: var(--muted); }
+#odd-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#odd-options .size-option { min-height: 54px; padding: 8px; }
+#odd-options .size-option b { font-size: 15px; }
+#pin-step, #size-best { font-size: 15px; }
+#size-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.size-option {
+  display: flex; flex-direction: column; justify-content: center; gap: 3px; min-height: 84px; padding: 10px; text-align: center; border-radius: 12px;
+  border: 2px solid var(--line); background: var(--panel-2); transition: background .15s, border-color .15s;
+}
+.size-option.a { border-color: #5fb4ff; }
+.size-option.b { border-color: #ffb347; }
+.size-option:hover:not(:disabled) { background: #1e2c49; }
+.size-option:disabled { cursor: default; opacity: .75; }
+.size-option.right { border-color: var(--win); opacity: 1; }
+.size-option.wrong { border-color: #ff5a36; opacity: 1; }
+.size-option b { font-size: 16px; line-height: 1.2; overflow-wrap: anywhere; }
+.size-option small { min-height: 16px; color: var(--muted); font-size: 12px; }
 #menu .credit { margin: 20px 0 0; }
 
 @media (max-width: 820px) {
-  .cards { grid-template-columns: 1fr; }
-  .menu-card { padding: 14px 16px; }
+  .cards { grid-template-columns: 1fr; gap: 10px; }
+  .menu-card, .menu-card:nth-child(n+7) { grid-column: auto; padding: 14px 16px; }
   .tagline { margin-bottom: 16px; }
   #app { flex-direction: column; }
   #stage { flex: 1 1 52%; }
@@ -244,11 +286,49 @@ dialog button.ghost { background: none; border-color: transparent; color: var(--
       <ul id="names-regions"></ul>
     </section>
 
-    <div id="search">
-      <input id="guess" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Name a country…"
-        role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
-      <ul id="suggestions" role="listbox" hidden></ul>
+    <section id="pin-card" class="card" data-for="pin" hidden>
+      <div class="tally"><b id="pin-score">0</b><span id="pin-max"></span><time id="pin-step"></time></div>
+      <p class="prompt"><span id="pin-label">Find</span> <b id="pin-target"></b></p>
+      <p id="pin-best"></p>
+    </section>
+    <section id="size-card" class="card" data-for="size" hidden>
+      <div class="tally"><b id="size-streak">0</b><span>in a row</span><time id="size-best"></time></div>
+      <p class="prompt"><span>Which country is bigger?</span></p>
+    </section>
+    <div id="size-options" data-for="size" hidden>
+      <button id="size-a" class="size-option a"><b></b><small></small></button>
+      <button id="size-b" class="size-option b"><b></b><small></small></button>
     </div>
+
+    <section id="nbr-card" class="card" data-for="nbr" hidden>
+      <div class="tally"><b id="nbr-count">0</b><span id="nbr-total"></span><time id="nbr-misses"></time></div>
+      <p class="prompt"><span>Name every neighbour of</span> <b id="nbr-target"></b></p>
+      <p id="nbr-stats"></p>
+    </section>
+    <section id="sweep-card" class="card" data-for="sweep" hidden>
+      <div class="tally sweep-top"><span id="sweep-region"></span><time id="sweep-step"></time></div>
+      <p class="prompt"><span id="sweep-label"></span> <b id="sweep-target"></b></p>
+      <p id="sweep-tries"></p>
+    </section>
+    <div id="sweep-regions" data-for="sweep" hidden></div>
+    <section id="odd-card" class="card" data-for="odd" hidden>
+      <div class="tally"><b id="odd-score">0</b><span>correct</span><time id="odd-lives"></time></div>
+      <p class="prompt"><span>Three have something in common. Which is the odd one out?</span></p>
+      <p id="odd-best"></p>
+    </section>
+    <div id="odd-options" data-for="odd" hidden>
+      <button id="odd-0" class="size-option"><b></b></button>
+      <button id="odd-1" class="size-option"><b></b></button>
+      <button id="odd-2" class="size-option"><b></b></button>
+      <button id="odd-3" class="size-option"><b></b></button>
+    </div>
+
+    <form id="search" data-for="heat hop names nbr" autocomplete="off">
+      <input id="guess" type="text" enterkeyhint="go" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Name a country…"
+        role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
+      <button id="guess-add" type="submit" data-for="names nbr" hidden>Add</button>
+      <ul id="suggestions" role="listbox" hidden></ul>
+    </form>
     <p id="notice" role="status" aria-live="polite"></p>
 
     <div id="hop-actions" class="actions" data-for="hop" hidden>
@@ -264,6 +344,34 @@ dialog button.ghost { background: none; border-color: transparent; color: var(--
       <button id="names-reset">Start over</button>
     </div>
     <ol id="names-list" class="rows" data-for="names" hidden></ol>
+
+    <div id="pin-actions" class="actions" data-for="pin" hidden>
+      <button id="pin-skip">Skip</button>
+      <button id="pin-next" hidden>Next country</button>
+      <button id="pin-new" hidden>New round</button>
+    </div>
+    <ol id="pin-list" class="rows" data-for="pin" hidden></ol>
+
+    <div class="actions" data-for="size" hidden>
+      <button id="size-again" hidden>Play again</button>
+    </div>
+
+    <div class="actions" data-for="nbr" hidden>
+      <button id="nbr-reveal">Show the answers</button>
+      <button id="nbr-next" hidden>Next country</button>
+    </div>
+    <ol id="nbr-list" class="rows" data-for="nbr" hidden></ol>
+
+    <div id="sweep-actions" class="actions" data-for="sweep" hidden>
+      <button id="sweep-skip">Show me</button>
+      <button id="sweep-change">Change region</button>
+    </div>
+    <ol id="sweep-list" class="rows" data-for="sweep" hidden></ol>
+
+    <div class="actions" data-for="odd" hidden>
+      <button id="odd-next" hidden>Next</button>
+      <button id="odd-again" hidden>Play again</button>
+    </div>
 
     <div id="actions" class="actions" data-for="heat">
       <button id="hint-btn">Hint</button>
@@ -287,8 +395,29 @@ dialog button.ghost { background: none; border-color: transparent; color: var(--
     <p class="muted">A country that doesn't border you counts as a miss, and you stay where you are. Try to match the best possible route. Hints show the next step.</p>
   </div>
   <div data-for="names" hidden>
-    <p>Name as many countries as you can. Type one and press Enter, and it lights up on the globe.</p>
+    <p>Name as many countries as you can. Type one and press Enter or Add, and it lights up on the globe.</p>
     <p class="muted">There are no suggestions here, but small spelling mistakes are still fixed. The clock starts with your first country, and your list is saved if you leave.</p>
+  </div>
+  <div data-for="pin" hidden>
+    <p>You get 10 countries, one at a time. Find each one on the globe and tap it.</p>
+    <p>An exact tap scores 100 points. A wrong tap scores up to 70, depending on how close it was. You only get one tap per country, so spin and zoom first.</p>
+    <p class="muted">Don't know it? Skip shows you where it is and scores 0. Very small countries never come up.</p>
+  </div>
+  <div data-for="size" hidden>
+    <p>Two countries light up. Tap the one with the bigger area, on the globe or with the buttons.</p>
+    <p class="muted">One wrong answer ends your streak, and the sizes get closer the longer you last. Very small countries never come up.</p>
+  </div>
+  <div data-for="nbr" hidden>
+    <p>One country lights up. Name every country that shares a land border with it.</p>
+    <p class="muted">Three wrong countries ends the round. There are no suggestions here, but small spelling mistakes are fixed, and a typo never costs you a miss. Tiny neighbours like Monaco count too.</p>
+  </div>
+  <div data-for="sweep" hidden>
+    <p>Choose a region, then tap each country as it's named until the whole region is done.</p>
+    <p class="muted">You get three tries per country, then it's shown to you. Your score is how many you found first try. Very small countries are left out.</p>
+  </div>
+  <div data-for="odd" hidden>
+    <p>Four countries light up. Three of them have something in common, so tap the one that doesn't belong, on the globe or with the buttons.</p>
+    <p class="muted">The link might be a region, a border with the same country, or having no land borders at all. You have three lives. Very small countries are left out.</p>
   </div>
   <div data-for="heat">
   <p>A country is hidden somewhere on the globe. Name any country to start.</p>
@@ -337,11 +466,16 @@ dialog button.ghost { background: none; border-color: transparent; color: var(--
 <div id="menu">
   <div class="menu-inner">
     <div class="logo">Meridian</div>
-    <p class="tagline">Three ways to learn the world</p>
+    <p class="tagline">Eight ways to learn the world</p>
     <div class="cards">
       <button class="menu-card" data-game="heat"><i class="swatch heat"></i><b>Hot &amp; Cold</b><span>Find the hidden country. Each guess shows how close you are.</span></button>
       <button class="menu-card" data-game="hop"><i class="swatch hop"></i><b>Border Hop</b><span>Cross the map from one country to another, one border at a time.</span></button>
       <button class="menu-card" data-game="names"><i class="swatch names"></i><b>Roll Call</b><span>Name every country you can and watch the world fill in.</span></button>
+      <button class="menu-card" data-game="pin"><i class="swatch pin"></i><b>Pin Drop</b><span>Find ten countries on the globe. The closer your tap, the more you score.</span></button>
+      <button class="menu-card" data-game="size"><i class="swatch size"></i><b>Bigger or Smaller</b><span>Two countries, one tap. Pick the bigger one and keep your streak alive.</span></button>
+      <button class="menu-card" data-game="nbr"><i class="swatch nbr"></i><b>Neighbours</b><span>One country, every border. Name all the countries that touch it.</span></button>
+      <button class="menu-card" data-game="sweep"><i class="swatch sweep"></i><b>Region Sweep</b><span>Choose a part of the world and tap every country in it.</span></button>
+      <button class="menu-card" data-game="odd"><i class="swatch odd"></i><b>Odd One Out</b><span>Three countries share something. Spot the one that doesn't.</span></button>
     </div>
     <p class="credit">Map data: Natural Earth. Country data: <a href="https://github.com/mledoze/countries" target="_blank" rel="noopener">mledoze/countries</a>, licensed under the <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noopener">ODbL</a>.</p>
   </div>
@@ -385,12 +519,16 @@ function editDistance(a, b, limit = 9) {
   return p1[b.length];
 }
 
+// Too general to stand for one country on their own.
+const COMMON_NAME_WORDS = new Set(['republic', 'north', 'south', 'united', 'states', 'kingdom', 'saint', 'islands', 'africa', 'city', 'arab']);
+
 class CountrySearch {
   constructor(countries) {
     this.entries = countries.map((c, index) => {
       const primary = normalize(c.name);
       const names = [primary, ...c.aliases].map(text => ({ text, key: soundKey(text), primary: text === primary }));
-      return { index, country: c, primary, names };
+      const words = primary.includes(' ') ? primary.split(' ').filter(w => w.length >= 4 && !COMMON_NAME_WORDS.has(w)) : [];
+      return { index, country: c, primary, names, words };
     });
   }
 
@@ -465,6 +603,16 @@ class CountrySearch {
     return best;
   }
 
+  // One word of an everyday name, like "Faso" for Burkina Faso. Aliases are left out: they hold formal and foreign names.
+  wordMatch(test, named) {
+    const hits = this.entries.filter(e => e.words.some(test));
+    if (!hits.length) return null;
+    const open = hits.filter(e => !named.has(e.index));
+    if (open.length > 1) return { pick: null, close: true };
+    const e = open[0] || hits[0];
+    return { pick: e.index, already: !open.length, corrected: true };
+  }
+
   // For Roll Call: the whole name must be right or a clear misspelling, so "a" never counts.
   strict(query, named) {
     const q = normalize(query);
@@ -476,6 +624,8 @@ class CountrySearch {
       return { pick: e.index, already: named.has(e.index), corrected: false };
     }
     if (q.length < 4) return { pick: null };
+    const word = this.wordMatch(w => w === q, named);
+    if (word) return word;
     const rank = list => list
       .map(e => ({ e, f: this.fuzzyScore(q, e, true) })).filter(x => x.f)
       .sort((a, b) => a.f.score - b.f.score);
@@ -485,6 +635,8 @@ class CountrySearch {
       if (b && b.f.score - a.f.score < .75) return { pick: null, close: true };
       return { pick: a.e.index, already: false, corrected: true };
     }
+    const nearWord = q.length >= 5 && this.wordMatch(w => editDistance(q, w, 1) <= 1, named);
+    if (nearWord) return nearWord;
     const done = rank(this.entries.filter(e => named.has(e.index)));
     return done.length ? { pick: done[0].e.index, already: true, corrected: true } : { pick: null };
   }
@@ -1105,7 +1257,8 @@ class Globe {
     };
     el.addEventListener('pointerup', end);
     el.addEventListener('pointercancel', end);
-    el.addEventListener('pointerleave', () => { if (!this.dragging) { this.hoverPoint = null; this.setHover(-1); } });
+    // Touch fires this straight after pointerup, so a tap still waiting for its pick must keep its point.
+    el.addEventListener('pointerleave', () => { if (!this.dragging && !this.clickQueued) { this.hoverPoint = null; this.setHover(-1); } });
     el.addEventListener('wheel', e => {
       e.preventDefault();
       const unit = e.deltaMode === 1 ? 16 : 1;
@@ -1257,7 +1410,7 @@ class Globe {
       id = out[3] === 0 || out[0] >= this.N ? -1 : out[0];
     }
     this.setHover(id);
-    if (this.clickQueued) { this.clickQueued = false; if (id >= 0) this.onSelect(id); }
+    if (this.clickQueued) { this.clickQueued = false; this.onSelect(id); }
   }
 
   // Small nations are too tiny to hit or see at globe scale, so they get markers.
@@ -1496,11 +1649,35 @@ class HopGame {
   }
 }
 
+// Well-known places that aren't on the country list, so Roll Call can say why instead of "not on the list".
+// Checked before spelling correction, which would otherwise turn "grenland" into Ireland.
+const TERRITORIES = new Map(Object.entries({
+  'part of Denmark': ['Greenland', 'Faroe Islands'],
+  'part of the United Kingdom': ['Northern Ireland'],
+  'a territory of the United Kingdom': ['Bermuda', 'Cayman Islands', 'Gibraltar'],
+  'a territory of the United States': ['Puerto Rico', 'Guam', 'American Samoa', 'US Virgin Islands', 'Northern Mariana Islands'],
+  'part of France': ['French Guiana', 'Guadeloupe', 'Martinique', 'Réunion'],
+  'a territory of France': ['New Caledonia', 'French Polynesia', 'Tahiti'],
+  'part of the Kingdom of the Netherlands': ['Aruba', 'Curaçao'],
+  'part of China': ['Hong Kong', 'Macau', 'Macao'],
+  'a continent, not a country': ['Antarctica'],
+  'a polar region, not a country': ['Antarctic', 'Arctic'],
+  'in the Arctic Ocean, not a country': ['North Pole'],
+  'in Antarctica, not a country': ['South Pole'],
+}).flatMap(([owner, places]) => places.map(name => [normalize(name), { name, owner }])));
+function findPlace(typed) {
+  const q = normalize(typed);
+  if (TERRITORIES.has(q)) return TERRITORIES.get(q);
+  if (q.length < 6) return null; // short names are too close to real countries to guess at
+  for (const [key, place] of TERRITORIES) if (key.length >= 6 && editDistance(q, key, 1) <= 1) return place;
+  return null;
+}
+
 class NamesGame {
   constructor(app) {
     this.app = app;
     this.noList = true; // suggestions would give the names away
-    this.placeholder = 'Type a country, press Enter…';
+    this.placeholder = 'Type a country…';
     $('names-reveal').addEventListener('click', () => this.reveal());
     $('names-reset').addEventListener('click', () => this.startOver());
   }
@@ -1571,11 +1748,14 @@ class NamesGame {
     const input = $('guess');
     input.disabled = !playing;
     input.placeholder = playing ? this.placeholder : 'Round over';
+    $('guess-add').disabled = !playing;
     const rows = [...this.order].reverse().map(i => row(NAMED_COLOR, C[i].name, ''));
     if (this.status === 'revealed') rows.unshift(...this.missing().map(i => row(MISSED_COLOR, C[i].name, 'Missed')));
     $('names-list').replaceChildren(...rows);
   }
   enterText(typed) {
+    const place = findPlace(typed);
+    if (place) { $('guess').value = ''; this.app.fail(`${place.name}: ${place.owner}, so not counted.`); return; }
     const r = this.app.search.strict(typed, this.named), C = this.countries;
     if (r.pick === null) { this.app.fail(r.close ? 'Too close to call. Spell a bit more of it.' : `“${typed}” isn't on the list.`); return; }
     $('guess').value = '';
@@ -1639,6 +1819,688 @@ class NamesGame {
   tooltip(i) {
     if (this.named.has(i)) return { title: this.countries[i].name, note: 'Named' };
     return this.status === 'revealed' ? { title: this.countries[i].name, note: 'Missed' } : null;
+  }
+}
+
+// Pin Drop and Bigger or Smaller leave out countries too small to see or tap at globe scale.
+const MIN_PLAYABLE_AREA = 20000; // km²
+const isPlayable = c => c.area >= MIN_PLAYABLE_AREA && c.rad >= .012;
+const playableIndexes = countries => countries.map((_, i) => i).filter(i => isPlayable(countries[i]));
+
+const PIN_ROUND = 10, PIN_EXACT = 100, PIN_NEAR_MAX = 70, PIN_NEAR_KM = 3000;
+const PIN_COLORS = { hit: '#3dffa2', near: '#ffb347', miss: '#ff5a36' };
+
+class PinGame {
+  constructor(app) {
+    this.app = app;
+    $('pin-skip').addEventListener('click', () => this.skip());
+    $('pin-next').addEventListener('click', () => this.advance());
+    $('pin-new').addEventListener('click', () => this.next());
+  }
+  get countries() { return this.app.data.countries; }
+  get score() { return this.results.reduce((sum, r) => sum + r.pts, 0); }
+  get done() { return this.step >= PIN_ROUND; }
+  used() { return false; }
+
+  enter() {
+    const s = this.app.store.pin, at = code => this.countries.findIndex(c => c.code === code);
+    const targets = s?.targets?.map(at);
+    if (targets?.length === PIN_ROUND && targets.every(i => i >= 0 && isPlayable(this.countries[i])) && s.results.length < PIN_ROUND) {
+      this.targets = targets;
+      this.results = s.results;
+    } else this.deal();
+    this.step = this.results.length;
+    this.waiting = false;
+    this.paint();
+  }
+  leave() {}
+  deal() {
+    const store = this.app.store, recent = new Set(store.pinRecent), pool = playableIndexes(this.countries).filter(i => !recent.has(this.countries[i].code));
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    this.targets = pool.slice(0, PIN_ROUND);
+    this.results = [];
+    this.step = 0;
+    this.waiting = false;
+    store.pinRecent = [...(store.pinRecent || []), ...this.targets.map(i => this.countries[i].code)].slice(-40);
+    this.persist();
+  }
+  persist() {
+    this.app.store.pin = { targets: this.targets.map(i => this.countries[i].code), results: this.results };
+    this.app.save();
+  }
+  next() {
+    this.app.clearTimers();
+    this.deal();
+    this.app.notice('');
+    this.paint();
+  }
+  paint() {
+    this.app.globe.resetColors();
+    this.app.globe.resetView();
+    this.render();
+  }
+  pick(i) {
+    if (this.waiting || this.done) return;
+    if (i < 0) { this.app.notice('Tap on a country.'); return; }
+    this.answer(i);
+  }
+  skip() { if (!this.waiting && !this.done) this.answer(-1); }
+  distanceText(km) {
+    const { units } = this.app.settings, v = units === 'mi' ? km * .621371 : km;
+    return `${Math.round(v).toLocaleString()} ${units}`;
+  }
+  answer(i) {
+    const app = this.app, g = app.globe, C = this.countries, t = this.targets[this.step], hit = i === t, skipped = i < 0;
+    const km = hit || skipped ? 0 : app.data.dist[i * C.length + t];
+    const pts = hit ? PIN_EXACT : skipped ? 0 : Math.max(0, Math.round(PIN_NEAR_MAX * (1 - km / PIN_NEAR_KM)));
+    this.results.push({ pick: skipped ? null : C[i].code, km, pts });
+    this.waiting = true;
+    if (this.results.length === PIN_ROUND) {
+      this.newBest = this.score > (app.store.pinBest || 0);
+      if (this.newBest) app.store.pinBest = this.score;
+    }
+    this.persist();
+
+    const hitRgb = hexToRgb(PIN_COLORS.hit);
+    g.setCountryColor(t, hitRgb, { pulse: 1 });
+    g.setLabel(t, C[t].name, PIN_COLORS.hit, 0);
+    if (!hit && !skipped) {
+      g.setCountryColor(i, hexToRgb(PIN_COLORS.miss));
+      g.setLabel(i, C[i].name, PIN_COLORS.miss, 1);
+    }
+    if (hit) {
+      g.fireRipple(t, hitRgb);
+      app.sound.guess(.9);
+      app.notice(`Spot on! ${C[t].name}. +${pts}`);
+      app.later(1100, () => this.advance());
+    } else {
+      g.flyToCountry(t, { minAlt: .75 });
+      if (skipped) app.notice(`${C[t].name} is here.`);
+      else {
+        app.sound.error();
+        app.notice(`That's ${C[i].name}, ${km ? `${this.distanceText(km)} away` : 'right next door'}. +${pts}`);
+      }
+    }
+    this.render();
+  }
+  advance() {
+    if (!this.waiting) return;
+    this.app.clearTimers();
+    this.waiting = false;
+    this.step++;
+    if (this.done) { this.finish(); return; }
+    this.paint();
+  }
+  finish() {
+    this.render();
+    this.app.sound.win();
+    this.showResult();
+  }
+  color(r) { return r.pts === PIN_EXACT ? PIN_COLORS.hit : r.pts >= PIN_NEAR_MAX / 2 ? PIN_COLORS.near : PIN_COLORS.miss; }
+  render() {
+    const C = this.countries, finished = this.done, best = this.app.store.pinBest || 0;
+    const missed = this.waiting && this.results.at(-1).pts !== PIN_EXACT;
+    $('pin-score').textContent = this.score;
+    $('pin-max').textContent = `/ ${PIN_ROUND * PIN_EXACT}`;
+    $('pin-step').textContent = `${Math.min(this.step + 1, PIN_ROUND)} of ${PIN_ROUND}`;
+    $('pin-best').textContent = best ? `Best score ${best}` : 'Zoom in for a closer look';
+    $('pin-label').textContent = finished ? 'Round complete' : 'Find';
+    $('pin-target').textContent = finished ? `${this.score} points` : C[this.targets[this.step]].name;
+    $('pin-skip').hidden = this.waiting || finished;
+    $('pin-next').hidden = !missed;
+    $('pin-next').textContent = this.step === PIN_ROUND - 1 ? 'See results' : 'Next country';
+    $('pin-new').hidden = !finished;
+    $('pin-list').replaceChildren(...this.results.map((r, k) => row(this.color(r), C[this.targets[k]].name, `+${r.pts}`)).reverse());
+  }
+  showResult() {
+    const exact = this.results.filter(r => r.pts === PIN_EXACT).length;
+    this.app.showResult({
+      kicker: this.newBest ? 'New best score' : 'Round complete',
+      name: `${this.score} / ${PIN_ROUND * PIN_EXACT}`,
+      facts: `${exact} of ${PIN_ROUND} found exactly`,
+      swatches: this.results.map(r => this.color(r)),
+      line: `Best score: ${this.app.store.pinBest || 0}.`,
+      next: 'New round',
+    });
+  }
+  shareText() { return `Meridian Pin Drop: ${this.score}/${PIN_ROUND * PIN_EXACT}`; }
+  tooltip(i) {
+    if (!this.app.globe.labels.has(i)) return null;
+    return { title: this.countries[i].name, note: i === this.targets[Math.min(this.step, PIN_ROUND - 1)] ? 'The answer' : 'Your tap' };
+  }
+}
+
+const SIZE_COLORS = { a: '#5fb4ff', b: '#ffb347', win: '#3dffa2' };
+const SIZE_MAX_APART = Math.cos(100 * Math.PI / 180); // both countries must fit on the visible side of the globe
+const unitVector = ([lon, lat]) => {
+  const l = lon * Math.PI / 180, f = lat * Math.PI / 180;
+  return [Math.cos(f) * Math.cos(l), Math.cos(f) * Math.sin(l), Math.sin(f)];
+};
+
+class SizeGame {
+  constructor(app) {
+    this.app = app;
+    $('size-a').addEventListener('click', () => this.choose(this.a));
+    $('size-b').addEventListener('click', () => this.choose(this.b));
+    $('size-again').addEventListener('click', () => this.next());
+  }
+  get countries() { return this.app.data.countries; }
+  used() { return false; }
+  enter() { this.next(); }
+  leave() {}
+  next() {
+    this.app.clearTimers();
+    this.pool = playableIndexes(this.countries);
+    this.streak = 0;
+    this.over = false;
+    this.a = this.b = -1;
+    this.app.notice('');
+    this.deal();
+  }
+  // Pairs start far apart in size and get closer as the streak grows.
+  ratioRange() { return this.streak < 5 ? [2.5, Infinity] : this.streak < 15 ? [1.5, 5] : [1.15, 2]; }
+  pair() {
+    const C = this.countries, P = this.pool, any = () => P[Math.floor(Math.random() * P.length)], [lo, hi] = this.ratioRange();
+    let a, b;
+    for (let tries = 0; tries < 2000; tries++) {
+      a = any(); b = any();
+      if (a === b || a === this.a || a === this.b || b === this.a || b === this.b) continue;
+      const ratio = Math.max(C[a].area, C[b].area) / Math.min(C[a].area, C[b].area);
+      const [u, v] = [unitVector(C[a].cen), unitVector(C[b].cen)];
+      if (ratio >= lo && ratio <= hi && u[0] * v[0] + u[1] * v[1] + u[2] * v[2] >= SIZE_MAX_APART) break;
+    }
+    return [a, b];
+  }
+  deal() {
+    [this.a, this.b] = this.pair();
+    this.waiting = false;
+    const C = this.countries, g = this.app.globe;
+    g.resetColors();
+    g.setCountryColor(this.a, hexToRgb(SIZE_COLORS.a));
+    g.setCountryColor(this.b, hexToRgb(SIZE_COLORS.b));
+    g.setLabel(this.a, C[this.a].name, SIZE_COLORS.a, 0);
+    g.setLabel(this.b, C[this.b].name, SIZE_COLORS.b, 1);
+    const u = unitVector(C[this.a].cen), v = unitVector(C[this.b].cen), m = u.map((x, k) => x + v[k]);
+    const lon = Math.atan2(m[1], m[0]) * 180 / Math.PI, lat = Math.atan2(m[2], Math.hypot(m[0], m[1])) * 180 / Math.PI;
+    g.flyTo(lon, clamp(lat, -60, 65), 1, .9);
+    this.render();
+  }
+  areaText(i) {
+    const { units } = this.app.settings, km2 = this.countries[i].area;
+    return `${Math.round(units === 'mi' ? km2 * .386102 : km2).toLocaleString()} ${units}²`;
+  }
+  pick(i) { if (i === this.a || i === this.b) this.choose(i); }
+  choose(i) {
+    if (this.waiting || this.over) return;
+    const app = this.app, C = this.countries, other = i === this.a ? this.b : this.a;
+    const right = C[i].area > C[other].area, big = right ? i : other, small = right ? other : i;
+    const times = C[big].area / C[small].area;
+    this.choice = i;
+    this.waiting = true;
+    app.globe.setCountryColor(big, hexToRgb(SIZE_COLORS.win), { pulse: 1 });
+    app.notice(`${C[big].name} is ${times < 10 ? times.toFixed(1) : Math.round(times).toLocaleString()}× the size of ${C[small].name}.`);
+    if (right) {
+      this.streak++;
+      if (this.streak > (app.store.sizeBest || 0)) { app.store.sizeBest = this.streak; this.newBest = true; app.save(); }
+      app.sound.guess(Math.min(.95, .3 + this.streak * .03));
+      app.later(1600, () => this.deal());
+    } else {
+      this.over = true;
+      app.sound.error();
+      app.later(1500, () => this.showResult());
+    }
+    this.render();
+  }
+  render() {
+    const C = this.countries;
+    $('size-streak').textContent = this.streak;
+    $('size-best').textContent = `Best ${this.app.store.sizeBest || 0}`;
+    [[$('size-a'), this.a], [$('size-b'), this.b]].forEach(([el, i]) => {
+      const other = i === this.a ? this.b : this.a;
+      el.firstElementChild.textContent = C[i].name;
+      el.lastElementChild.textContent = this.waiting ? this.areaText(i) : '';
+      el.disabled = this.waiting;
+      el.classList.toggle('right', this.waiting && C[i].area > C[other].area);
+      el.classList.toggle('wrong', this.waiting && i === this.choice && C[i].area < C[other].area);
+    });
+    $('size-again').hidden = !this.over;
+  }
+  showResult() {
+    const C = this.countries, [big, small] = C[this.a].area > C[this.b].area ? [this.a, this.b] : [this.b, this.a];
+    this.app.showResult({
+      kicker: this.newBest ? 'New best streak' : 'Streak over',
+      name: `${this.streak} in a row`,
+      facts: `${C[big].name} (${this.areaText(big)}) is bigger than ${C[small].name} (${this.areaText(small)}).`,
+      swatches: Array(Math.min(this.streak, 40)).fill(SIZE_COLORS.win),
+      line: `Best streak: ${this.app.store.sizeBest || 0}.`,
+      next: 'Play again',
+    });
+    this.newBest = false;
+  }
+  shareText() { return `Meridian Bigger or Smaller: ${this.streak} in a row`; }
+  tooltip(i) {
+    if (i !== this.a && i !== this.b) return null;
+    return { title: this.countries[i].name, note: this.waiting ? this.areaText(i) : 'Tap the bigger one' };
+  }
+}
+
+// Frames a set of countries, for the games that show a whole neighbourhood at once.
+const groupCentre = (countries, list) => {
+  const m = list.map(i => unitVector(countries[i].cen)).reduce((s, v) => s.map((x, k) => x + v[k]), [0, 0, 0]);
+  const len = Math.hypot(...m);
+  return m.map(x => x / len);
+};
+function flyToGroup(g, countries, list) {
+  const m = groupCentre(countries, list);
+  const reach = Math.max(...list.map(i => {
+    const v = unitVector(countries[i].cen);
+    return Math.acos(clamp(v[0] * m[0] + v[1] * m[1] + v[2] * m[2], -1, 1)) + countries[i].rad;
+  }));
+  const lon = Math.atan2(m[1], m[0]) * 180 / Math.PI, lat = Math.asin(m[2]) * 180 / Math.PI;
+  g.flyTo(lon, clamp(lat, -70, 75), g.altFit / clamp(reach * 3.3, .5, g.altFit));
+}
+const shuffle = list => {
+  for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+  return list;
+};
+
+const NBR_MISSES = 3;
+const NBR_COLORS = { target: '#ffb347', found: '#2fd6b5', wrong: '#ff5a36', missed: '#c0506a' };
+
+class NeighbourGame {
+  constructor(app) {
+    this.app = app;
+    this.noList = true; // suggestions would give the names away
+    this.recent = [];
+    $('nbr-reveal').addEventListener('click', () => this.reveal());
+    $('nbr-next').addEventListener('click', () => this.next());
+  }
+  get countries() { return this.app.data.countries; }
+  get neighbours() { return this.countries[this.target].borders; }
+  used(i) { return this.found.has(i); }
+  enter() { this.deal(); }
+  leave() {}
+  deal() {
+    const C = this.countries;
+    const pool = playableIndexes(C).filter(i => C[i].borders.length >= 2 && !this.recent.includes(i));
+    this.target = pool[Math.floor(Math.random() * pool.length)];
+    this.recent = [...this.recent, this.target].slice(-30);
+    this.found = new Set();
+    this.wrong = [];
+    this.status = 'playing';
+    this.app.notice('');
+    const g = this.app.globe;
+    g.resetColors();
+    g.setCountryColor(this.target, hexToRgb(NBR_COLORS.target));
+    g.setLabel(this.target, C[this.target].name, NBR_COLORS.target, 0);
+    flyToGroup(g, C, [this.target, ...this.neighbours]);
+    this.render();
+  }
+  next() {
+    this.app.clearTimers();
+    this.deal();
+    $('guess').focus();
+  }
+  enterText(typed) {
+    if (this.status !== 'playing') return;
+    const app = this.app, C = this.countries, input = $('guess'), name = C[this.target].name;
+    const place = findPlace(typed);
+    if (place) { input.value = ''; app.fail(`${place.name}: ${place.owner}, so not counted.`); return; }
+    // Everything but the neighbours still to find counts as taken, so "Congo" and typos lean towards a right answer.
+    const open = new Set(this.neighbours.filter(i => !this.found.has(i)));
+    const q = normalize(typed), named = app.search.entries.find(e => open.has(e.index) && e.names.some(n => n.text === q || (q === 'congo' && n.text.includes(q))));
+    if (named) { input.value = ''; this.add(named.index); return; }
+    const r = app.search.strict(typed, new Set(C.map((_, i) => i).filter(i => !open.has(i))));
+    if (r.pick === null) { app.fail(r.close ? 'Too close to call. Spell a bit more of it.' : `“${typed}” isn't on the list.`); return; }
+    input.value = '';
+    if (open.has(r.pick)) { this.add(r.pick); return; }
+    if (r.pick === this.target) { app.fail(`That's ${name} itself.`); return; }
+    if (this.found.has(r.pick)) { app.fail(`You already named ${C[r.pick].name}.`); return; }
+    if (r.corrected) { app.fail(`“${typed}” doesn't match a neighbour of ${name}.`); return; }
+    this.miss(r.pick);
+  }
+  add(i) {
+    const app = this.app, g = app.globe, C = this.countries;
+    this.found.add(i);
+    g.setCountryColor(i, hexToRgb(NBR_COLORS.found));
+    g.setLabel(i, C[i].name, NBR_COLORS.found, this.found.size);
+    g.fireRipple(i, hexToRgb(NBR_COLORS.found));
+    app.sound.guess(.35 + .6 * this.found.size / this.neighbours.length);
+    app.notice(`${C[i].name}!`);
+    if (this.found.size === this.neighbours.length) this.end('won');
+    this.render();
+  }
+  miss(i) {
+    const app = this.app, g = app.globe, C = this.countries;
+    this.wrong.push(i);
+    g.setCountryColor(i, hexToRgb(NBR_COLORS.wrong));
+    g.setLabel(i, C[i].name, NBR_COLORS.wrong, 50 + this.wrong.length);
+    app.fail(`${C[i].name} doesn't border ${C[this.target].name}.`);
+    if (this.wrong.length >= NBR_MISSES) this.end('lost');
+    this.render();
+  }
+  end(status) {
+    const app = this.app, s = app.store.nbr ||= { cleared: 0, perfect: 0 }, n = this.neighbours.length;
+    this.status = status;
+    if (status === 'won') {
+      s.cleared++;
+      if (!this.wrong.length) s.perfect++;
+      app.save();
+      app.sound.win();
+      app.notice(`All ${n} found${this.wrong.length ? '' : ' with no misses'}!`);
+    } else {
+      const g = app.globe, C = this.countries;
+      this.neighbours.filter(i => !this.found.has(i)).forEach((i, k) => {
+        g.setCountryColor(i, hexToRgb(NBR_COLORS.missed));
+        g.setLabel(i, C[i].name, NBR_COLORS.missed, 20 + k);
+      });
+      app.notice(`You found ${this.found.size} of ${n}.`);
+    }
+  }
+  reveal() { if (this.status === 'playing') { this.end('lost'); this.render(); } }
+  render() {
+    const C = this.countries, s = this.app.store.nbr || { cleared: 0, perfect: 0 }, n = this.neighbours.length, playing = this.status === 'playing';
+    $('nbr-count').textContent = this.found.size;
+    $('nbr-total').textContent = `/ ${n}`;
+    $('nbr-misses').textContent = `Misses ${this.wrong.length} of ${NBR_MISSES}`;
+    $('nbr-target').textContent = C[this.target].name;
+    $('nbr-stats').textContent = `Cleared ${s.cleared} · No misses ${s.perfect}`;
+    $('nbr-reveal').hidden = !playing;
+    $('nbr-next').hidden = playing;
+    const input = $('guess');
+    input.disabled = !playing;
+    input.placeholder = playing ? 'Name a neighbour…' : 'Round over';
+    $('guess-add').disabled = !playing;
+    const rows = [...this.found].reverse().map(i => row(NBR_COLORS.found, C[i].name, ''));
+    if (!playing) rows.unshift(...this.neighbours.filter(i => !this.found.has(i)).map(i => row(NBR_COLORS.missed, C[i].name, 'Missed')));
+    $('nbr-list').replaceChildren(...rows);
+  }
+  tooltip(i) {
+    if (!this.app.globe.labels.has(i)) return null;
+    return { title: this.countries[i].name, note: i === this.target ? 'Name its neighbours' : this.found.has(i) ? 'Neighbour' : this.wrong.includes(i) ? 'Not a neighbour' : 'Missed' };
+  }
+}
+
+// Small regions are merged so every sweep has enough countries left once tiny ones are removed.
+const SWEEP_REGIONS = {
+  'Northern Europe': ['Northern Europe'],
+  'Western & Central Europe': ['Western Europe', 'Central Europe'],
+  'Southern & Eastern Europe': ['Southern Europe', 'Southeast Europe', 'Eastern Europe'],
+  'Northern Africa': ['Northern Africa'],
+  'Western Africa': ['Western Africa'],
+  'Eastern Africa': ['Eastern Africa'],
+  'Central & Southern Africa': ['Middle Africa', 'Southern Africa'],
+  'Western Asia': ['Western Asia'],
+  'Central & South Asia': ['Central Asia', 'Southern Asia'],
+  'East & Southeast Asia': ['Eastern Asia', 'South-Eastern Asia'],
+  'North & Central America': ['North America', 'Central America', 'Caribbean'],
+  'South America': ['South America'],
+};
+const SWEEP_TRIES = 3;
+const SWEEP_COLORS = { first: '#3dffa2', later: '#ffb347', shown: '#c0506a', wrong: '#ff5a36' };
+
+class SweepGame {
+  constructor(app) {
+    this.app = app;
+    $('sweep-skip').addEventListener('click', () => { if (this.playing && !this.waiting) this.show(); });
+    $('sweep-change').addEventListener('click', () => this.enter());
+  }
+  get countries() { return this.app.data.countries; }
+  get playing() { return !!this.region && this.step < this.order.length; }
+  used() { return false; }
+  members(region) {
+    const subs = SWEEP_REGIONS[region];
+    return playableIndexes(this.countries).filter(i => subs.includes(this.countries[i].subregion));
+  }
+  enter() {
+    this.app.clearTimers();
+    this.region = null;
+    this.app.notice('');
+    this.app.globe.resetColors();
+    this.app.globe.resetView();
+    $('sweep-regions').replaceChildren(...Object.keys(SWEEP_REGIONS).map(region => {
+      const b = document.createElement('button'), best = this.app.store.sweepBest?.[region], total = this.members(region).length;
+      const n = document.createElement('b'), note = document.createElement('small');
+      n.textContent = region;
+      note.textContent = best === undefined ? `${total} countries` : `Best ${best} of ${total}`;
+      b.append(n, note);
+      b.addEventListener('click', () => this.start(region));
+      return b;
+    }));
+    this.render();
+  }
+  leave() {}
+  start(region) {
+    this.app.clearTimers();
+    this.region = region;
+    this.order = shuffle(this.members(region));
+    this.step = 0;
+    this.tries = 0;
+    this.marks = new Map();
+    this.waiting = false;
+    this.app.notice('');
+    this.app.globe.resetColors();
+    flyToGroup(this.app.globe, this.countries, this.order);
+    this.render();
+  }
+  next() { this.start(this.region); }
+  pick(i) {
+    if (!this.playing || this.waiting) return;
+    const app = this.app, g = app.globe, C = this.countries, t = this.order[this.step];
+    if (i < 0) { app.notice('Tap on a country.'); return; }
+    if (this.marks.has(i)) { app.notice(`${C[i].name} is already done.`); return; }
+    if (i === t) {
+      const mark = this.tries ? 'later' : 'first';
+      this.mark(t, mark);
+      g.fireRipple(t, hexToRgb(SWEEP_COLORS[mark]));
+      app.sound.guess(.9);
+      app.notice(`${C[t].name}!`);
+      this.advance();
+      return;
+    }
+    this.tries++;
+    g.setCountryColor(i, hexToRgb(SWEEP_COLORS.wrong));
+    app.later(800, () => { if (!this.marks.has(i)) g.setCountryColor(i, LAND_RGB); });
+    app.fail(`That's ${C[i].name}.`);
+    if (this.tries >= SWEEP_TRIES) this.show();
+    else this.render();
+  }
+  mark(i, kind) {
+    this.marks.set(i, kind);
+    this.app.globe.setCountryColor(i, hexToRgb(SWEEP_COLORS[kind]));
+    this.app.globe.setLabel(i, this.countries[i].name, SWEEP_COLORS[kind], this.marks.size);
+  }
+  show() {
+    const t = this.order[this.step];
+    this.mark(t, 'shown');
+    this.app.notice(`${this.countries[t].name} is here.`);
+    this.waiting = true;
+    this.render();
+    this.app.later(1500, () => this.advance());
+  }
+  advance() {
+    this.waiting = false;
+    this.tries = 0;
+    this.step++;
+    if (this.playing) { this.render(); return; }
+    const first = this.firstTries(), s = this.app.store.sweepBest ||= {};
+    this.newBest = first > (s[this.region] ?? -1);
+    if (this.newBest) { s[this.region] = first; this.app.save(); }
+    this.render();
+    this.app.sound.win();
+    this.showResult();
+  }
+  firstTries() { return [...this.marks.values()].filter(k => k === 'first').length; }
+  render() {
+    const C = this.countries, picking = !this.region, playing = this.playing, n = picking ? 0 : this.order.length;
+    $('sweep-label').textContent = picking ? 'Choose a region to sweep' : playing ? 'Find' : 'Sweep complete';
+    $('sweep-target').textContent = picking ? '' : playing ? C[this.order[this.step]].name : `${this.firstTries()} of ${n} first try`;
+    $('sweep-region').textContent = this.region || '';
+    $('sweep-step').textContent = playing ? `${this.step + 1} of ${n}` : '';
+    $('sweep-tries').textContent = playing ? `Tries left ${SWEEP_TRIES - this.tries}` : '';
+    $('sweep-regions').hidden = !picking;
+    $('sweep-actions').hidden = picking;
+    $('sweep-skip').hidden = !playing || this.waiting;
+    $('sweep-list').replaceChildren(...(picking ? [] : [...this.marks].reverse().map(([i, k]) => row(SWEEP_COLORS[k], C[i].name, k === 'first' ? 'First try' : k === 'later' ? 'Found' : 'Shown'))));
+  }
+  showResult() {
+    const first = this.firstTries(), n = this.order.length;
+    this.app.showResult({
+      kicker: this.newBest ? 'New best' : 'Sweep complete',
+      name: `${first} of ${n}`,
+      facts: `${this.region}, found first try`,
+      swatches: [...this.marks.values()].map(k => SWEEP_COLORS[k]),
+      line: `Best here: ${this.app.store.sweepBest[this.region]} of ${n}.`,
+      next: 'Sweep again',
+    });
+  }
+  shareText() { return `Meridian Region Sweep: ${this.firstTries()}/${this.order.length} first try in ${this.region}`; }
+  tooltip(i) {
+    if (!this.region || !this.marks.has(i)) return null;
+    return { title: this.countries[i].name, note: this.region };
+  }
+}
+
+const ODD_LIVES = 3;
+const ODD_MAX_SPREAD = Math.cos(80 * Math.PI / 180); // all four must fit on the visible side of the globe
+const ODD_COLORS = { lit: '#5fb4ff', odd: '#3dffa2', wrong: '#ff5a36' };
+
+class OddGame {
+  constructor(app) {
+    this.app = app;
+    this.buttons = ['odd-0', 'odd-1', 'odd-2', 'odd-3'].map($);
+    this.buttons.forEach((b, k) => b.addEventListener('click', () => this.choose(this.four[k])));
+    $('odd-next').addEventListener('click', () => { this.app.clearTimers(); this.deal(); });
+    $('odd-again').addEventListener('click', () => this.next());
+  }
+  get countries() { return this.app.data.countries; }
+  used() { return false; }
+  enter() { this.next(); }
+  leave() {}
+  next() {
+    this.app.clearTimers();
+    this.pool = playableIndexes(this.countries);
+    this.score = 0;
+    this.lives = ODD_LIVES;
+    this.over = false;
+    this.newBest = false;
+    this.deal();
+  }
+  // True when `list` has something in common that `other` lacks, which would make `other` a second odd one out.
+  sets(list, other) {
+    const C = this.countries, all = key => list.every(i => C[i][key] === C[list[0]][key]);
+    if (all('subregion') && C[other].subregion !== C[list[0]].subregion) return true;
+    if (all('region') && C[other].region !== C[list[0]].region) return true;
+    if (list.every(i => !C[i].borders.length) && C[other].borders.length) return true;
+    return C[list[0]].borders.some(x => list.every(i => C[i].borders.includes(x)) && !C[other].borders.includes(x));
+  }
+  valid(three, odd) {
+    const C = this.countries, four = [...three, odd];
+    if (new Set(four).size !== 4) return false;
+    const m = groupCentre(C, four);
+    if (four.some(i => { const v = unitVector(C[i].cen); return v[0] * m[0] + v[1] * m[1] + v[2] * m[2] < ODD_MAX_SPREAD; })) return false;
+    return three.every(x => !this.sets(four.filter(i => i !== x), x));
+  }
+  // Early odd ones can come from anywhere. Later they come from the same continent, which is much harder to spot.
+  oddFor(seed, any) {
+    if (this.score < 4) return any();
+    const C = this.countries, near = this.pool.filter(i => C[i].region === C[seed].region);
+    return near[Math.floor(Math.random() * near.length)];
+  }
+  // Each maker returns three countries with something in common, an odd one without it, and the explanation.
+  bySubregion(any) {
+    const C = this.countries, seed = any(), same = this.pool.filter(i => C[i].subregion === C[seed].subregion);
+    if (same.length < 3) return null;
+    const three = shuffle(same).slice(0, 3), odd = this.oddFor(seed, any);
+    return C[odd].subregion === C[seed].subregion ? null : { three, odd, why: `are all in ${C[seed].subregion}` };
+  }
+  byNeighbour(any) {
+    const C = this.countries, x = any(), around = C[x].borders.filter(i => isPlayable(C[i]));
+    if (around.length < 3) return null;
+    const three = shuffle(around).slice(0, 3), odd = this.oddFor(x, any);
+    return odd === x || C[odd].borders.includes(x) ? null : { three, odd, why: `all border ${C[x].name}` };
+  }
+  byIslands(any) {
+    const C = this.countries, three = shuffle(this.pool.filter(i => !C[i].borders.length)).slice(0, 3), odd = any();
+    return C[odd].borders.length ? { three, odd, why: 'have no land borders' } : null;
+  }
+  puzzle() {
+    const any = () => this.pool[Math.floor(Math.random() * this.pool.length)];
+    const makers = [this.bySubregion, this.bySubregion, this.byNeighbour, this.byNeighbour, this.byIslands];
+    for (;;) {
+      const p = makers[Math.floor(Math.random() * makers.length)].call(this, any);
+      if (p && this.valid(p.three, p.odd) && !p.three.includes(this.odd)) return p;
+    }
+  }
+  deal() {
+    const p = this.puzzle(), C = this.countries, g = this.app.globe;
+    this.odd = p.odd;
+    this.why = p.why;
+    this.four = shuffle([...p.three, p.odd]);
+    this.choice = -1;
+    this.waiting = false;
+    this.app.notice('');
+    g.resetColors();
+    this.four.forEach((i, k) => {
+      g.setCountryColor(i, hexToRgb(ODD_COLORS.lit));
+      g.setLabel(i, C[i].name, ODD_COLORS.lit, k);
+    });
+    flyToGroup(g, C, this.four);
+    this.render();
+  }
+  pick(i) { if (this.four.includes(i)) this.choose(i); }
+  choose(i) {
+    if (this.waiting || this.over) return;
+    const app = this.app, g = app.globe, C = this.countries, right = i === this.odd;
+    this.choice = i;
+    this.waiting = true;
+    g.setCountryColor(this.odd, hexToRgb(ODD_COLORS.odd), { pulse: 1 });
+    g.setLabel(this.odd, C[this.odd].name, ODD_COLORS.odd, 0);
+    const reason = `The other three ${this.why}.`;
+    if (right) {
+      this.score++;
+      if (this.score > (app.store.oddBest || 0)) { app.store.oddBest = this.score; this.newBest = true; app.save(); }
+      app.sound.guess(Math.min(.95, .3 + this.score * .03));
+      app.notice(`Yes, ${C[this.odd].name}! ${reason}`);
+      app.later(2600, () => this.deal());
+    } else {
+      this.lives--;
+      g.setCountryColor(i, hexToRgb(ODD_COLORS.wrong));
+      app.sound.error();
+      app.notice(`It was ${C[this.odd].name}. ${reason}`);
+      if (!this.lives) { this.over = true; app.later(2600, () => this.showResult()); }
+    }
+    this.render();
+  }
+  render() {
+    const C = this.countries;
+    $('odd-score').textContent = this.score;
+    $('odd-lives').textContent = `Lives ${this.lives}`;
+    $('odd-best').textContent = `Best ${this.app.store.oddBest || 0}`;
+    this.buttons.forEach((b, k) => {
+      const i = this.four[k];
+      b.firstElementChild.textContent = C[i].name;
+      b.disabled = this.waiting;
+      b.classList.toggle('right', this.waiting && i === this.odd);
+      b.classList.toggle('wrong', this.waiting && i === this.choice && i !== this.odd);
+    });
+    $('odd-next').hidden = !this.waiting || this.choice === this.odd || this.over;
+    $('odd-again').hidden = !this.over;
+  }
+  showResult() {
+    this.app.showResult({
+      kicker: this.newBest ? 'New best' : 'Out of lives',
+      name: `${this.score} correct`,
+      facts: `You had ${ODD_LIVES} lives.`,
+      swatches: Array(Math.min(this.score, 40)).fill(ODD_COLORS.odd),
+      line: `Best: ${this.app.store.oddBest || 0}.`,
+      next: 'Play again',
+    });
+  }
+  shareText() { return `Meridian Odd One Out: ${this.score} correct`; }
+  tooltip(i) {
+    if (!this.four.includes(i)) return null;
+    return { title: this.countries[i].name, note: this.waiting && i === this.odd ? 'The odd one out' : 'Tap the odd one out' };
   }
 }
 
@@ -1718,6 +2580,11 @@ class App {
     this.applySettingsForm();
     this.hop = new HopGame(this);
     this.names = new NamesGame(this);
+    this.pin = new PinGame(this);
+    this.size = new SizeGame(this);
+    this.nbr = new NeighbourGame(this);
+    this.sweep = new SweepGame(this);
+    this.odd = new OddGame(this);
     this.active = null; // null means Hot & Cold, which lives in this class
     this.screen = 'menu';
     document.addEventListener('visibilitychange', () => {
@@ -1737,7 +2604,7 @@ class App {
     this.screen = name;
     $('menu').hidden = true;
     document.querySelectorAll('[data-for]').forEach(el => { el.hidden = !el.dataset.for.split(' ').includes(name); });
-    $('game-title').textContent = { heat: 'Hot & Cold', hop: 'Border Hop', names: 'Roll Call' }[name];
+    $('game-title').textContent = { heat: 'Hot & Cold', hop: 'Border Hop', names: 'Roll Call', pin: 'Pin Drop', size: 'Bigger or Smaller', nbr: 'Neighbours', sweep: 'Region Sweep', odd: 'Odd One Out' }[name];
     $('guess').value = '';
     this.closeList();
     this.notice('');
@@ -1971,10 +2838,9 @@ class App {
       li.append(n);
       const note = !this.active && this.used(o.index) ? 'guessed' : o.via || '';
       if (note) { const s = document.createElement('small'); s.textContent = note; li.append(s); }
-      li.addEventListener('pointerdown', e => {
-        e.preventDefault();
-        this.submit(o.index, o.corrected ? $('guess').value.trim() : null);
-      });
+      // Select on click, not on press: closing the list mid-tap sends the tap through to the button beneath.
+      li.addEventListener('mousedown', e => e.preventDefault()); // keep focus, or blur closes the list first
+      li.addEventListener('click', () => this.submit(o.index, o.corrected ? $('guess').value.trim() : null));
       ul.append(li);
     });
     ul.hidden = false;
@@ -2090,6 +2956,13 @@ class App {
   // ---- events ---------------------------------------------------------------------------------
   bindEvents() {
     const input = $('guess');
+    // A form rather than a keydown check: Android keyboards often report Enter as an unidentified key.
+    $('search').addEventListener('submit', e => {
+      e.preventDefault();
+      this.enter();
+      if (this.active?.noList) input.focus();
+    });
+    $('guess-add').addEventListener('mousedown', e => e.preventDefault()); // keep the phone keyboard open
     input.addEventListener('input', () => { this.notice(''); this.updateList(); });
     input.addEventListener('blur', () => setTimeout(() => this.closeList(), 80));
     input.addEventListener('focus', () => { if (input.value) this.updateList(); });
@@ -2097,7 +2970,6 @@ class App {
       const n = this.options.length;
       if (e.key === 'ArrowDown' && n) { e.preventDefault(); this.activeIndex = (this.activeIndex + 1) % n; this.paintActive(); }
       else if (e.key === 'ArrowUp' && n) { e.preventDefault(); this.activeIndex = (this.activeIndex - 1 + n) % n; this.paintActive(); }
-      else if (e.key === 'Enter') { e.preventDefault(); this.enter(); }
       else if (e.key === 'Escape') { if (n) this.closeList(); else input.blur(); }
     });
     document.querySelectorAll('#modes button').forEach(b => b.addEventListener('click', () => { if (b.dataset.mode !== this.mode) this.startMode(b.dataset.mode); }));
@@ -2124,6 +2996,8 @@ class App {
     this.globe.onHover = i => this.showTooltip(i);
     this.globe.onSelect = i => {
       if (this.screen === 'menu') return;
+      if (this.active?.pick) { this.active.pick(i); return; }
+      if (i < 0) return;
       if (this.active ? this.active.tooltip(i) : this.round.has(i) || (i === this.round.answer && this.round.status !== 'playing')) this.globe.flyToCountry(i);
     };
     $('overlay').addEventListener('pointermove', e => {
